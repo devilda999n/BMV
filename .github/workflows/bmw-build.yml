@@ -32,10 +32,35 @@ jobs:
 
       - name: Build BMW Browser
         run: ./gradlew app:assembleForkRelease -PversionName="1.0.0"
+      - name: Sign BMW APKs
+        run: |
+          keytool -genkeypair -noprompt \
+            -keystore bmw-debug.jks \
+            -storetype JKS \
+            -storepass android \
+            -keypass android \
+            -alias bmw \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=BMW Browser,O=Personal,C=IN"
 
+          APKSIGNER=$(find "$ANDROID_SDK_ROOT/build-tools" -name apksigner | sort -V | tail -1)
+
+          for apk in gradle/build/app/outputs/apk/forkRelease/*-unsigned.apk; do
+            output="${apk%-unsigned.apk}.apk"
+            "$APKSIGNER" sign \
+              --ks bmw-debug.jks \
+              --ks-key-alias bmw \
+              --ks-pass pass:android \
+              --key-pass pass:android \
+              --out "$output" \
+              "$apk"
+            "$APKSIGNER" verify "$output"
+          done
       - name: Upload BMW APK
         uses: actions/upload-artifact@v4
         with:
           name: BMW-Browser-APK
-          path: gradle/build/app/outputs/apk/forkRelease/*.apk
+          path: gradle/build/app/outputs/apk/forkRelease/app-*-forkRelease.apk
           if-no-files-found: error
