@@ -19,7 +19,11 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+      - name: Install Android SDK
+        run: ./automation/iceraven/install-sdk.sh
 
+      - name: Patch Iceraven
+        run: ./automation/iceraven/patch_android_components.sh
       - name: Make Gradle executable
         run: chmod +x gradlew
 
