@@ -31,11 +31,11 @@ jobs:
         run: echo "autosignReleaseWithDebugKey=" >> local.properties
 
       - name: Build BMW Browser
-        run: ./gradlew app:assemblefenixForkRelease -PversionName="1.0.0"
+        run: ./gradlew app:assembleForkRelease -PversionName="1.0.0"
 
       - name: Upload BMW APK
         uses: actions/upload-artifact@v4
         with:
           name: BMW-Browser-APK
-          path: app/build/outputs/apk/fenix/forkRelease/*.apk
+          path: gradle/build/app/outputs/apk/forkRelease/*.apk
           if-no-files-found: error
